@@ -18,31 +18,48 @@
  */
 
 // Import Node.JS Filesystem Library
-import * as fs from 'fs';
+import * as fs from "fs";
 
 // Import winston Logging Library
-const winston = require('winston');
+const winston = require("winston");
 
 // Import Discord.JS Library
-import * as discord from 'discord.js';
-import {Client, Message, TextChannel} from "discord.js";
-import {EchobotConfiguration} from './model/configuration.model';
+import * as discord from "discord.js";
+import { Client, Message, TextChannel } from "discord.js";
+import { EchobotConfiguration } from "./model/configuration.model";
 import * as http from "http";
 import path = require("path");
+import { EchobotOptions } from "./model/options.model";
+import { EchobotFilter } from "./model/filter.model";
+import { EchobotRedirect } from "./model/redirect.model";
 
 // Constants
-const imageExts = ["jpg", "jpeg", "png", "gif", "webp", "tif", "tiff", "bmp", "svg", "jif", "jfif", "apng"]
+const imageExts = [
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "webp",
+    "tif",
+    "tiff",
+    "bmp",
+    "svg",
+    "jif",
+    "jfif",
+    "apng",
+];
 
 // Configure logger
 const logger = winston.createLogger({
-    level: 'info',
+    level: "info",
     format: winston.format.combine(
         winston.format.timestamp(),
-        winston.format.printf(info => {
-            return `${info.timestamp} [${info.level.toLocaleUpperCase()}]: ${info.message}`;
+        winston.format.printf((info) => {
+            return `${info.timestamp} [${info.level.toLocaleUpperCase()}]: ${info.message
+                }`;
         })
     ),
-    transports: new winston.transports.Console()
+    transports: new winston.transports.Console(),
 });
 
 // Create global configuration variable.
@@ -61,10 +78,8 @@ main();
  * Starts the bot, verifying configuration files as needed.
  */
 function main(): void {
-
     // Load the configuration file.
-    if (!loadConfiguration())
-        return;
+    if (!loadConfiguration()) return;
 
     // Start the web server.
     startWebServer();
@@ -85,46 +100,63 @@ function loadConfiguration(): boolean {
         // Parse the env var contents as JSON.
         config = JSON.parse(process.env.ECHOBOT_CONFIG_JSON);
     } else {
-        logger['error']("No configuration could be found. Either create a config.json file or put the config in the ECHOBOT_CONFIG_JSON environment variable.");
+        logger["error"](
+            "No configuration could be found. Either create a config.json file or put the config in the ECHOBOT_CONFIG_JSON environment variable."
+        );
         return false;
     }
 
     // Ensure the config has a Discord token defined.
     if (!config.token) {
-        logger['error']("The Discord Client token is missing from the configuration file.");
+        logger["error"](
+            "The Discord Client token is missing from the configuration file."
+        );
         return false;
     }
 
     // Validate format of redirects
-    if (!config.redirects) { // Ensure redirects exist.
-        logger['error']("You have not defined any redirects. This bot is useless without them.");
+    if (!config.redirects && !config.filteredRedirects) {
+        // Ensure redirects exist.
+        logger["error"](
+            "You have not defined any redirects. This bot is useless without them."
+        );
         return false;
-    } else if (!Array.isArray(config.redirects)) { // Ensure redirects is an array.
-        logger['error']("The redirects are not properly formatted (missing array). Please check your configuration.");
+
+    } else if (!Array.isArray(config.redirects)) {
+        // Ensure redirects is an array.
+        logger["error"](
+            "The redirects are not properly formatted (missing array). Please check your configuration."
+        );
         return false;
-    } else if (config.redirects.length == 0) { // Ensure we have at least one redirect.
-        logger['error']("You have not defined any redirects. This bot is useless without them.");
+    } else if (
+        config.redirects?.length == 0 &&
+        config.filteredRedirects?.length == 0
+    ) {
+        // Ensure we have at least one redirect.
+        logger["error"](
+            "You have not defined any redirects. This bot is useless without them."
+        );
         return false;
     } else {
-
         // Check each redirect.
         for (let redirect of config.redirects) {
-
             // Check source.
             if (!redirect.sources || redirect.sources.length == 0) {
-                logger['error']("A redirect has no sources.");
+                logger["error"]("A redirect has no sources.");
                 return false;
             } else if (!Array.isArray(redirect.sources)) {
-                logger['error']("A redirect's sources were not formatted as an array.");
+                logger["error"]("A redirect's sources were not formatted as an array.");
                 return false;
             }
 
             // Check destination.
             if (!redirect.destinations || redirect.destinations.length == 0) {
-                logger['error']("A redirect has no destinations.");
+                logger["error"]("A redirect has no destinations.");
                 return false;
             } else if (!Array.isArray(redirect.destinations)) {
-                logger['error']("A redirect's destinations were not formatted as an array.");
+                logger["error"](
+                    "A redirect's destinations were not formatted as an array."
+                );
                 return false;
             }
 
@@ -132,7 +164,54 @@ function loadConfiguration(): boolean {
             for (let source of redirect.sources) {
                 for (let destination of redirect.destinations) {
                     if (source == destination) {
-                        logger['error']("A redirect has a source that is the same as a destination: " + source + ". This will result in an infinite loop.");
+                        logger["error"](
+                            "A redirect has a source that is the same as a destination: " +
+                            source +
+                            ". This will result in an infinite loop."
+                        );
+                        return false;
+                    }
+                }
+            }
+        }
+        // console.log(config)
+        // console.log(config.filteredRedirects)
+        for (let redirect of config.filteredRedirects) {
+            if (redirect.words.length == 0) {
+                logger["error"]("A Filtered redirect has no words.");
+            }
+            // Check source.
+            if (!redirect.redirect.sources || redirect.redirect.sources.length == 0) {
+                logger["error"]("A redirect has no sources.");
+                return false;
+            } else if (!Array.isArray(redirect.redirect.sources)) {
+                logger["error"]("A redirect's sources were not formatted as an array.");
+                return false;
+            }
+
+            // Check destination.
+            if (
+                !redirect.redirect.destinations ||
+                redirect.redirect.destinations.length == 0
+            ) {
+                logger["error"]("A redirect has no destinations.");
+                return false;
+            } else if (!Array.isArray(redirect.redirect.destinations)) {
+                logger["error"](
+                    "A redirect's destinations were not formatted as an array."
+                );
+                return false;
+            }
+
+            // Check for loop.
+            for (let source of redirect.redirect.sources) {
+                for (let destination of redirect.redirect.destinations) {
+                    if (source == destination) {
+                        logger["error"](
+                            "A redirect has a source that is the same as a destination: " +
+                            source +
+                            ". This will result in an infinite loop."
+                        );
                         return false;
                     }
                 }
@@ -141,7 +220,7 @@ function loadConfiguration(): boolean {
     }
 
     // Validation complete.
-    logger['info']("Configuration loaded successfully.");
+    logger["info"]("Configuration loaded successfully.");
     return true;
 }
 
@@ -152,18 +231,18 @@ function loadConfiguration(): boolean {
  * which expect applications to bind to a web port -- as well as allowing for uptime monitoring.
  */
 function startWebServer(): void {
-
     // Ensure PORT env var is defined.
-    if (!process.env.PORT || isNaN(Number.parseInt(process.env.PORT)))
-        return;
+    if (!process.env.PORT || isNaN(Number.parseInt(process.env.PORT))) return;
 
-    logger['info']("Starting web server on port " + process.env.PORT);
+    logger["info"]("Starting web server on port " + process.env.PORT);
 
     // Create a server and bind it to the environment variable PORT.
-    http.createServer((req, res) => {
-        res.write("pong");
-        res.end();
-    }).listen(process.env.PORT);
+    http
+        .createServer((req, res) => {
+            res.write("pong");
+            res.end();
+        })
+        .listen(process.env.PORT);
 }
 
 /**
@@ -175,26 +254,24 @@ function loginToDiscord(): void {
     discordClient = new discord.Client();
 
     // Register event for when client is ready.
-    discordClient.on('ready', () => {
-        logger['info']("Signed into Discord.");
+    discordClient.on("ready", () => {
+        logger["info"]("Signed into Discord.");
     });
 
     // Register event for when client receives a message.
-    discordClient.on('message', onDiscordClientMessageReceived);
+    discordClient.on("message", onDiscordClientMessageReceived);
 
     // Register event for when an error occurs.
-    discordClient.on('error', error => {
-        logger['error']("An error occurred: " + error.message);
-        logger['info']("Restarting Discord Client.");
+    discordClient.on("error", (error) => {
+        logger["error"]("An error occurred: " + error.message);
+        logger["info"]("Restarting Discord Client.");
         loginToDiscord();
     });
 
     // Login.
-    discordClient
-        .login(config.token)
-        .catch(err => {
-            logger['error']("Could not sign into Discord: " + err);
-        });
+    discordClient.login(config.token).catch((err) => {
+        logger["error"]("Could not sign into Discord: " + err);
+    });
 }
 
 /**
@@ -202,122 +279,188 @@ function loginToDiscord(): void {
  * @param message The message that was received.
  */
 function onDiscordClientMessageReceived(message: Message): void {
-
     // Find redirects that have this message's channel id as a source.
-    let matchingRedirects = config.redirects.filter(redirect =>
-        redirect.sources.some(source => source == message.channel.id)
+    let matchingRedirects = config.redirects.filter((redirect) =>
+        redirect.sources.some((source) => source == message.channel.id)
     );
 
+    redirect(message, matchingRedirects);
+    
+     
+    // logger["info"]("Reached Here")
+    let matchingRedirectsFiltered = config.filteredRedirects.filter((filteredRedirects) => 
+
+         filteredRedirects.redirect.sources.some((source) => source == message.channel.id)&&
+        
+        
+        filteredRedirects.words.some(word =>{
+            if (filteredRedirects.removeQuote)
+                var regexMatcher=    new RegExp(`${word.toLowerCase()}(?=[^"]*(?:"[^"]*"[^"]*)*$)`)
+            else
+                var regexMatcher=   new RegExp(`${word.toLowerCase()}`)
+            // console.log(message.content.toLowerCase().match(regexMatcher)?.length>0);
+             return  message.content.toLowerCase().match(regexMatcher)?.length>0;
+            
+        })
+    )
+        .map(echobotFilter => echobotFilter.redirect);
+    redirect(message, matchingRedirectsFiltered);
+
+
+}
+function redirect(message: Message, matchingRedirects: EchobotRedirect[]): void {
     // Redirect to each destination.
-    matchingRedirects.forEach(redirect => {
-        redirect.destinations.forEach(destination => {
+    matchingRedirects.forEach((redirect) => {
+        redirect.destinations.forEach((destination) => {
             // Find destination channel.
             let destChannel = discordClient.channels.get(destination);
             if (destChannel == null) {
-                logger['error']("Could not redirect from channel ID " + message.channel.id + " to channel ID "
-                    + destination + ": Destination channel was not found.");
+                logger["error"](
+                    "Could not redirect from channel ID " +
+                    message.channel.id +
+                    " to channel ID " +
+                    destination +
+                    ": Destination channel was not found."
+                );
                 return;
             } else if (!(destChannel instanceof TextChannel)) {
-                logger['error']("Could not redirect from channel ID " + message.channel.id + " to channel ID "
-                    + destination + ": Destination channel is not a text channel.");
+                logger["error"](
+                    "Could not redirect from channel ID " +
+                    message.channel.id +
+                    " to channel ID " +
+                    destination +
+                    ": Destination channel is not a text channel."
+                );
                 return;
             }
 
             // Relay message.
-            logger['info']("Redirecting message by " + message.author.username
-                + " from " + message.guild.name + "/" + (message.channel as TextChannel).name
-                + " to " + destChannel.guild.name + "/" + destChannel.name
+            logger["info"](
+                "Redirecting message by " +
+                message.author.username +
+                " from " +
+                message.guild.name +
+                "/" +
+                (message.channel as TextChannel).name +
+                " to " +
+                destChannel.guild.name +
+                "/" +
+                destChannel.name
             );
-
-            let messageContents = message.content;
-
-            // Copy rich embed if requested.
-            if(redirect.options && redirect.options.copyRichEmbed) {
-                message.embeds.forEach(value => {
-                   if(value.type == "rich") {
-                       messageContents = value.description;
-                   }
-                });
-            }
-
-            // Remove @everyone if requested.
-            if (redirect.options && redirect.options.removeEveryone)
-                messageContents = messageContents.replace("@everyone", "");
-
-            // Remove @here if requested.
-            if (redirect.options && redirect.options.removeHere)
-                messageContents = messageContents.replace("@here", "");
-
-            // Determine if we are sending a rich embed or not. (This is decided by if a color is set).
-            if (redirect.options && redirect.options.richEmbed) {
-                // Sending a rich embed.
-                let richEmbed = new discord.RichEmbed({
-                    color: redirect.options.richEmbedColor ? redirect.options.richEmbedColor : 30975,
-                    description: messageContents
-                });
-
-                // Add title if requested.
-                if(redirect.options.title) {
-                    richEmbed.setTitle(redirect.options.title);
-                }
-
-                // Add source if requested.
-                if (redirect.options.includeSource) {
-                    richEmbed.addField("Author", `**${message.member.displayName}** in **${message.guild.name}/${(message.channel as TextChannel).name}**`);
-                }
-
-                // Add attachments if requested.
-                if(redirect.options.copyAttachments) {
-                    const originalAttachment = message.attachments.first();
-                    if(originalAttachment) {
-                        richEmbed.attachFile(new discord.Attachment(originalAttachment.url, originalAttachment.filename))
-                        
-                        const ext = path.extname(originalAttachment.url).toLowerCase().replace(".", "");
-                        if(ext && imageExts.includes(ext))
-                            richEmbed.setImage(`attachment://${originalAttachment.filename}`)
-                    }
-                }
-
-                // Send rich embed message.
-                if(lastEcho != richEmbed.description) {
-                    (destChannel as TextChannel).send({embed: richEmbed});
-                    lastEcho = richEmbed.description;
-                }
-                return;
-            } else {
-                // Sending a standard message.
-                let destinationMessage = "";
-
-                // Add title if requested.
-                if (redirect.options && redirect.options.title) {
-                    destinationMessage += "**" + redirect.options.title + "**\n";
-                }
-
-                // Add source if requested.
-                if (redirect.options && redirect.options.includeSource) {
-                    destinationMessage += `*Author: **${message.member.displayName}** in **${message.guild.name}/${(message.channel as TextChannel).name}***\n`;
-                }
-
-                destinationMessage += `\n`;
-
-                // Add copied message.
-                destinationMessage += messageContents;
-
-                // Add attachments if requested.
-                let attachment: discord.Attachment | undefined;
-                if(redirect.options.copyAttachments) {
-                    const originalAttachment = message.attachments.first();
-                    if(originalAttachment)
-                        attachment = new discord.Attachment(originalAttachment.url, originalAttachment.filename)
-                }
-
-                // Send message.
-                if(lastEcho != destinationMessage) {
-                    (destChannel as TextChannel).send(destinationMessage, attachment);
-                    lastEcho = destinationMessage;
-                }
-                return;
-            }
+            sendMessage(message, destChannel, redirect.options)
         });
     });
+}
+
+function sendMessage(
+    message: Message,
+    destChannel: discord.Channel,
+    options: EchobotOptions
+): void {
+    let messageContents = message.content;
+    // Copy rich embed if requested.
+    if (options && options.copyRichEmbed) {
+        message.embeds.forEach((value) => {
+            if (value.type == "rich") {
+                messageContents = value.description;
+            }
+        });
+    }
+
+    // Remove @everyone if requested.
+    if (options && options.removeEveryone)
+        messageContents = messageContents.replace("@everyone", "");
+
+    // Remove @here if requested.
+    if (options && options.removeHere)
+        messageContents = messageContents.replace("@here", "");
+
+    // Determine if we are sending a rich embed or not. (This is decided by if a color is set).
+    if (options && options.richEmbed) {
+        // Sending a rich embed.
+        let richEmbed = new discord.RichEmbed({
+            color: options.richEmbedColor
+                ? options.richEmbedColor
+                : 30975,
+            description: messageContents,
+        });
+
+        // Add title if requested.
+        if (options.title) {
+            richEmbed.setTitle(options.title);
+        }
+
+        // Add source if requested.
+        if (options.includeSource) {
+            richEmbed.addField(
+                "Author",
+                `**${message.member.displayName}** in **${message.guild.name}/${(message.channel as TextChannel).name
+                }**`
+            );
+        }
+
+        // Add attachments if requested.
+        if (options.copyAttachments) {
+            const originalAttachment = message.attachments.first();
+            if (originalAttachment) {
+                richEmbed.attachFile(
+                    new discord.Attachment(
+                        originalAttachment.url,
+                        originalAttachment.filename
+                    )
+                );
+
+                const ext = path
+                    .extname(originalAttachment.url)
+                    .toLowerCase()
+                    .replace(".", "");
+                if (ext && imageExts.includes(ext))
+                    richEmbed.setImage(`attachment://${originalAttachment.filename}`);
+            }
+        }
+
+        // Send rich embed message.
+        if (lastEcho != richEmbed.description) {
+            (destChannel as TextChannel).send({ embed: richEmbed });
+            lastEcho = richEmbed.description;
+        }
+        return;
+    } else {
+        // Sending a standard message.
+        let destinationMessage = "";
+
+        // Add title if requested.
+        if (options && options.title) {
+            destinationMessage += "**" + options.title + "**\n";
+        }
+
+        // Add source if requested.
+        if (options && options.includeSource) {
+            destinationMessage += `*Author: **${message.member.displayName}** in **${message.guild.name
+                }/${(message.channel as TextChannel).name}***\n`;
+        }
+
+        destinationMessage += `\n`;
+
+        // Add copied message.
+        destinationMessage += messageContents;
+
+        // Add attachments if requested.
+        let attachment: discord.Attachment | undefined;
+        if (options.copyAttachments) {
+            const originalAttachment = message.attachments.first();
+            if (originalAttachment)
+                attachment = new discord.Attachment(
+                    originalAttachment.url,
+                    originalAttachment.filename
+                );
+        }
+
+        // Send message.
+        if (lastEcho != destinationMessage) {
+            (destChannel as TextChannel).send(destinationMessage, attachment);
+            lastEcho = destinationMessage;
+        }
+        return;
+    }
 }

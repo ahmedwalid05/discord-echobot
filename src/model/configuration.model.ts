@@ -18,6 +18,8 @@
  */
 
 import { EchobotRedirect } from "./redirect.model";
+import { EchobotFilter } from "./filter.model";
+
 
 /**
  * Represents the Echobot configuration file format.
@@ -34,5 +36,10 @@ export interface EchobotConfiguration {
      * All message redirect definitions.
      */
     redirects?: EchobotRedirect[];
+
+    filteredRedirects?: EchobotFilter[];
+
+    
+
 
 }
