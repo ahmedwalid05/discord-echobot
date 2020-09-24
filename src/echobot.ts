@@ -294,7 +294,7 @@ function onDiscordClientMessageReceived(message: Message): void {
         
         
         filteredRedirects.words.some(word =>{
-            if (filteredRedirects.removeQuote)
+            if (filteredRedirects.ignoreQuote)
                 var regexMatcher=    new RegExp(`${word.toLowerCase()}(?=[^"]*(?:"[^"]*"[^"]*)*$)`)
             else
                 var regexMatcher=   new RegExp(`${word.toLowerCase()}`)

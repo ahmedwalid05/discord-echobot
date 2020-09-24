@@ -6,6 +6,6 @@ export interface EchobotFilter {
     redirect?: EchobotRedirect;
 
     words?: string[];
-    removeQuote? : boolean;
+    ignoreQuote? : boolean;
 
 }
