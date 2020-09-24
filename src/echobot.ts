@@ -284,33 +284,37 @@ function onDiscordClientMessageReceived(message: Message): void {
         redirect.sources.some((source) => source == message.channel.id)
     );
 
-    redirect(message, matchingRedirects);
-    
-     
-    // logger["info"]("Reached Here")
-    let matchingRedirectsFiltered = config.filteredRedirects.filter((filteredRedirects) => 
 
-         filteredRedirects.redirect.sources.some((source) => source == message.channel.id)&&
-        
-        
-        filteredRedirects.words.some(word =>{
+
+
+    // logger["info"]("Reached Here")
+    let matchingRedirectsFiltered = config.filteredRedirects.filter((filteredRedirects) =>
+
+        filteredRedirects.redirect.sources.some((source) => source == message.channel.id) &&
+
+
+        filteredRedirects.words.some(word => {
             if (filteredRedirects.ignoreQuote)
-                var regexMatcher=    new RegExp(`${word.toLowerCase()}(?=[^"]*(?:"[^"]*"[^"]*)*$)`)
+                var regexMatcher = new RegExp(`${word.toLowerCase()}(?=[^"]*(?:"[^"]*"[^"]*)*$)`)
             else
-                var regexMatcher=   new RegExp(`${word.toLowerCase()}`)
+                var regexMatcher = new RegExp(`${word.toLowerCase()}`)
             // console.log(message.content.toLowerCase().match(regexMatcher)?.length>0);
-             return  message.content.toLowerCase().match(regexMatcher)?.length>0;
-            
+            return message.content.toLowerCase().match(regexMatcher)?.length > 0;
+
         })
     )
         .map(echobotFilter => echobotFilter.redirect);
+    redirect(message, matchingRedirects);
     redirect(message, matchingRedirectsFiltered);
 
 
+
 }
-function redirect(message: Message, matchingRedirects: EchobotRedirect[]): void {
+async function redirect(message: Message, matchingRedirects: EchobotRedirect[]): Promise<void> {
+
     // Redirect to each destination.
     matchingRedirects.forEach((redirect) => {
+
         redirect.destinations.forEach((destination) => {
             // Find destination channel.
             let destChannel = discordClient.channels.get(destination);
@@ -357,6 +361,7 @@ function sendMessage(
     destChannel: discord.Channel,
     options: EchobotOptions
 ): void {
+    
     let messageContents = message.content;
     // Copy rich embed if requested.
     if (options && options.copyRichEmbed) {
@@ -420,10 +425,10 @@ function sendMessage(
         }
 
         // Send rich embed message.
-        if (lastEcho != richEmbed.description) {
+        // if (lastEcho != richEmbed.description) {
             (destChannel as TextChannel).send({ embed: richEmbed });
-            lastEcho = richEmbed.description;
-        }
+            // lastEcho = richEmbed.description;
+        // }
         return;
     } else {
         // Sending a standard message.
@@ -455,12 +460,12 @@ function sendMessage(
                     originalAttachment.filename
                 );
         }
-
+        
         // Send message.
-        if (lastEcho != destinationMessage) {
-            (destChannel as TextChannel).send(destinationMessage, attachment);
-            lastEcho = destinationMessage;
-        }
+        // if (lastEcho != destinationMessage) {
+        (destChannel as TextChannel).send(destinationMessage, attachment);
+        // lastEcho = destinationMessage;
+        // }
         return;
     }
 }
