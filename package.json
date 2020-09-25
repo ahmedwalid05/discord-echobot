@@ -36,6 +36,8 @@
   },
   "dependencies": {
     "discord.js": "^11.6.4",
+    "get-urls": "^10.0.0",
+    "is-image-url": "^1.1.8",
     "winston": "^3.2.1"
   },
   "devDependencies": {

@@ -17,7 +17,8 @@
                 "removeEveryone": true,
                 "removeHere": true,
                 "copyRichEmbed": true,
-                "copyAttachments": true
+                "copyAttachments": true,
+                "accurateImage":true
             }
         }
     ],
@@ -39,7 +40,8 @@
                     "removeEveryone": true,
                     "removeHere": true,
                     "copyRichEmbed": true,
-                    "copyAttachments": true
+                    "copyAttachments": true,
+                    "accurateImage":true
                 }
             },
             "words": [

@@ -33,6 +33,8 @@ import { EchobotOptions } from "./model/options.model";
 import { EchobotFilter } from "./model/filter.model";
 import { EchobotRedirect } from "./model/redirect.model";
 
+const getUrls = require('get-urls');
+const isImageUrl = require('is-image-url');
 // Constants
 const imageExts = [
     "jpg",
@@ -361,7 +363,7 @@ function sendMessage(
     destChannel: discord.Channel,
     options: EchobotOptions
 ): void {
-    
+
     let messageContents = message.content;
     // Copy rich embed if requested.
     if (options && options.copyRichEmbed) {
@@ -372,6 +374,8 @@ function sendMessage(
         });
     }
 
+    let image= getImageLink(messageContents, options.accurateImage);
+    
     // Remove @everyone if requested.
     if (options && options.removeEveryone)
         messageContents = messageContents.replace("@everyone", "");
@@ -388,8 +392,9 @@ function sendMessage(
                 ? options.richEmbedColor
                 : 30975,
             description: messageContents,
+            
         });
-
+        richEmbed.setImage(image)
         // Add title if requested.
         if (options.title) {
             richEmbed.setTitle(options.title);
@@ -426,8 +431,8 @@ function sendMessage(
 
         // Send rich embed message.
         // if (lastEcho != richEmbed.description) {
-            (destChannel as TextChannel).send({ embed: richEmbed });
-            // lastEcho = richEmbed.description;
+        (destChannel as TextChannel).send({ embed: richEmbed });
+        // lastEcho = richEmbed.description;
         // }
         return;
     } else {
@@ -460,7 +465,7 @@ function sendMessage(
                     originalAttachment.filename
                 );
         }
-        
+
         // Send message.
         // if (lastEcho != destinationMessage) {
         (destChannel as TextChannel).send(destinationMessage, attachment);
@@ -468,4 +473,18 @@ function sendMessage(
         // }
         return;
     }
+}
+function getImageLink(message: string, accurate): string {
+    let links = getUrls(message)
+    // if(links[])
+    // console.log(links[0])
+    // console.log(links)
+    for (let entry of links) {
+        if (isImageUrl(entry, accurate)){
+            return entry
+        }
+            
+    }
+    return null;
+
 }

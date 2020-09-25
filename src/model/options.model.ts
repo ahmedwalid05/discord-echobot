@@ -77,4 +77,6 @@ export interface EchobotOptions {
   copyAttachments?: boolean;
 
   // };
+
+  accurateImage?: boolean;
 }
