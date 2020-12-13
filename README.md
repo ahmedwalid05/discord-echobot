@@ -1,7 +1,7 @@
 # Discord Echobot
-[![GitHub license](https://img.shields.io/github/license/MitchTalmadge/discord-echobot)](https://github.com/MitchTalmadge/discord-echobot/blob/master/LICENSE.md)
-[![Actions Status](https://github.com/MitchTalmadge/discord-echobot/workflows/CI/badge.svg)](https://github.com/MitchTalmadge/discord-echobot/actions)
-[![GitHub issues](https://img.shields.io/github/issues/MitchTalmadge/discord-echobot)](https://github.com/MitchTalmadge/discord-echobot/issues)
+[![GitHub license](https://img.shields.io/github/license/ahmedwalid05/discord-echobot)](https://github.com/ahmedwalid05/discord-echobot/blob/master/LICENSE.md)
+[![Actions Status](https://github.com/ahmedwalid05/discord-echobot/workflows/CI/badge.svg)](https://github.com/ahmedwalid05/discord-echobot/actions)
+[![GitHub issues](https://img.shields.io/github/issues/ahmedwalid05/discord-echobot)](https://github.com/ahmedwalid05/discord-echobot/issues)
 
 The purpose of this bot is to allow you to copy messages from one Discord channel to another Discord channel, even if you don't have permission to add a bot account to the guild you are copying from.
 
@@ -15,7 +15,7 @@ To setup and run this bot, you must first [install Node.js](https://nodejs.org/e
 
 ## Setup
 
-1. Download the [latest release](https://github.com/MitchTalmadge/discord-echobot/releases/latest) source code.
+1. Download the [latest release](https://github.com/ahmedwalid05/discord-echobot/releases/latest) source code.
 2. Extract the source code to a folder of your choosing.
 3. Configure the bot by **either**:
     - Creating a file called `config.json` in the extracted directory and filling it out. You can see `config.example.json` for an example.
@@ -23,6 +23,74 @@ To setup and run this bot, you must first [install Node.js](https://nodejs.org/e
     - Pasting the entire config JSON (what would normally be in your file) into the environment variable `ECHOBOT_CONFIG_JSON`.
 4. Open a command prompt or terminal in the extracted directory, and run `npm install`.
 
+
+
+An Example of a config file
+
+```json
+{
+    "token": "mfa.yourtoken-shouldgoherejklsdfhsoiehfseihfseifbisoehfoisefise",
+    "redirects": [
+        {
+            "sources": [
+                "283746523864294373",
+                "293786491642983642"
+            ],
+            "destinations": [
+                {
+                    "id": "780897979828797461",
+                    "token": "AGZw.yourtoken-shouldgoherejklsdfhsoiehfseihfseifbisoehfoisefise"
+                }
+            ],
+            "options": {
+                "title": "New Copied Message",
+                "richEmbed": true,
+                "richEmbedColor": 30975,
+                "includeSource": true,
+                "removeEveryone": true,
+                "removeHere": true,
+                "copyRichEmbed": true,
+                "copyAttachments": true,
+                "accurateImage": true
+            }
+        }
+    ],
+    "filteredRedirects": [
+        {
+            "redirect": {
+                "sources": [
+                    "283746523864294373",
+                    "293786491642983642"
+                ],
+                "destinations": [
+                    {
+                        "id": "129863219696239848",
+                        "token": "AGZw.yourtoken-shouldgoherejklsdfhsoiehfseihfseifbisoehfoisefise"
+                    }
+                ],
+                "options": {
+                    "title": "New Copied Message",
+                    "richEmbed": true,
+                    "richEmbedColor": 30975,
+                    "includeSource": true,
+                    "removeEveryone": true,
+                    "removeHere": true,
+                    "copyRichEmbed": true,
+                    "copyAttachments": true,
+                    "accurateImage": true
+                }
+            },
+            "words": [
+                "Bot",
+                "Test", 
+                "Stocks"
+            ],
+            "ignoreQuote": true
+        }
+    ]
+}
+
+```
 ### Options
 
 * `title`: Displayed at the top of each message. Optional.
@@ -48,7 +116,12 @@ To setup and run this bot, you must first [install Node.js](https://nodejs.org/e
 
 * `copyAttachments`: When true, the attached file of a message (pdf, image, gif, etc.) will be copied into the new message.
   * ```"copyAttachments": true```
+* `accurateImage`: When true, (with `copyAttachments`) any link that discord automatically converts to image, will also be converted to an image
 
+
+### Filtered Redirects extra Options
+* `words`: Any message that will have any of these, will be redirected
+* `ignoreQuote`: Ignore messages that have quotes around it 
 ### Finding your Token
 
 This Discord bot is called a "self-bot," meaning it runs as your personal Discord account rather than a separate bot account.
@@ -79,17 +152,6 @@ Redirect sources and destinations use Channel IDs, which look like large numbers
 
 The ID will now be on your clipboard and can be pasted into the config.
 
-
-## Deployment
-
 ### Run Locally
 
 Open a command prompt or terminal in the extracted directory, and run `npm start`. You must have both `node` and `npm` installed.
-
-### Heroku
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/MitchTalmadge/discord-echobot/tree/master)
-
-This bot is compatible with Heroku. You can use the button above to deploy it quickly. 
-
-Use the `ECHOBOT_CONFIG_JSON` environment variable to create your config. Simply put everything that would normally be in the config.json file into this variable. Formatting does not matter.

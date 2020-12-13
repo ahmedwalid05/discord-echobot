@@ -1,11 +1,11 @@
+import { WebhookId } from ".";
 import { EchobotOptions } from "./options.model";
 export interface EchobotRedirect {
     
 
-    sources?: string[];
-
+    sources: string[];
     
-    destinations?: string[];
+    destinations: WebhookId[];
 
     options?: EchobotOptions;
 

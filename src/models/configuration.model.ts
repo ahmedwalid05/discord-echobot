@@ -30,7 +30,7 @@ export interface EchobotConfiguration {
      * The secret Discord client token.
      * Obtainable using Chrome Dev Tools in the Discord client.
      */
-    token?: string;
+    token: string;
 
     /**
      * All message redirect definitions.

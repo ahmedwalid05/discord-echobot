@@ -17,19 +17,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { WebhookId } from ".";
+
+
+
 /**
  * Represents a message redirect definition.
  */
 export interface EchobotOptions {
-  /**
-   * The source channel IDs, where messages will originate from.
-   */
-  sources?: string[];
-
-  /**
-   * The destination channel IDs, where messages will be copied to.
-   */
-  destinations?: string[];
 
   /**
    * Optional settings for how messages should be displayed in destination channels.
@@ -44,7 +39,7 @@ export interface EchobotOptions {
   /**
    * Determines whether or not to use a rich embed or plain text.
    */
-  richEmbed?: boolean;
+  // richEmbed?: boolean;
 
   /**
    * The color of the left border on the rich embed, if enabled.

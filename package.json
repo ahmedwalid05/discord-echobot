@@ -35,15 +35,19 @@
     "ext": "*"
   },
   "dependencies": {
+    "discord-webhook-node": "^1.1.8",
     "discord.js": "^11.6.4",
     "get-urls": "^10.0.0",
     "is-image-url": "^1.1.8",
+    "node-fetch": "^2.6.1",
     "winston": "^3.2.1"
   },
   "devDependencies": {
     "typescript": "^3.8.3",
     "@types/node": "^13.13.4",
+    "@types/node-fetch": "^2.5.7",
     "nodemon": "^2.0.3",
+    "nexe": "^3.3.7",
     "ts-node": "^8.10.1"
   },
   "repositories": [

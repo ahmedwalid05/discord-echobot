@@ -9,3 +9,6 @@ npm-debug.log
 *.iml
 *.ipr
 *.iws
+log.log
+schema.json
+vtrpc.ico

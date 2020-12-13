@@ -7,7 +7,10 @@
                 "293786491642983642"
             ],
             "destinations": [
-                "129863219696239848"
+                {
+                    "id": "780897979828797461",
+                    "token": "AGZw.yourtoken-shouldgoherejklsdfhsoiehfseihfseifbisoehfoisefise"
+                }
             ],
             "options": {
                 "title": "New Copied Message",
@@ -18,7 +21,7 @@
                 "removeHere": true,
                 "copyRichEmbed": true,
                 "copyAttachments": true,
-                "accurateImage":true
+                "accurateImage": true
             }
         }
     ],
@@ -30,7 +33,10 @@
                     "293786491642983642"
                 ],
                 "destinations": [
-                    "129863219696239848"
+                    {
+                        "id": "129863219696239848",
+                        "token": "AGZw.yourtoken-shouldgoherejklsdfhsoiehfseihfseifbisoehfoisefise"
+                    }
                 ],
                 "options": {
                     "title": "New Copied Message",
@@ -41,13 +47,14 @@
                     "removeHere": true,
                     "copyRichEmbed": true,
                     "copyAttachments": true,
-                    "accurateImage":true
+                    "accurateImage": true
                 }
             },
             "words": [
                 "Bot",
-                "Test"
-            ], 
+                "Test", 
+                "Stocks"
+            ],
             "ignoreQuote": true
         }
     ]
