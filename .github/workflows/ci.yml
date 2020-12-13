@@ -7,18 +7,19 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [10.x, 12.x]
+        node: [10.x, 12.x, '15.x']
     steps:
-      - name: Setup Environment for Node ${{ matrix.node-version }}
-        uses: actions/setup-node@v1.1.0
+      - name: Setup Environment for Node ${{ matrix.node  }}
+        uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ matrix.node }}
 
       - name: Checkout Repository
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
       
       - name: Install Dependencies
         run: npm install
 
       - name: Build
         run: npm run build
+
