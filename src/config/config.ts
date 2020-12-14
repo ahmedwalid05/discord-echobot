@@ -1,6 +1,9 @@
 import { logger } from '../logger'
 import * as fs from "fs";
-import { EchobotConfiguration, EchobotFilter, EchobotRedirect } from '../models';
+import { EchobotConfiguration, EchobotFilter, EchobotRedirect, WebhookId } from '../models';
+import { Path } from 'path-parser'
+import { url } from 'inspector';
+import { assert } from 'console';
 
 
 /**
@@ -70,6 +73,7 @@ function checkConfiguration(config: EchobotConfiguration): EchobotConfiguration 
     return config;
 }
 function checkRedirectModel(redirects: EchobotRedirect[]) {
+    let path = new Path('/api/webhooks/:id/:token')
     for (let redirect of redirects) {
         // Check source.
         if (!redirect.sources || redirect.sources.length == 0) {
@@ -91,9 +95,17 @@ function checkRedirectModel(redirects: EchobotRedirect[]) {
                 "A redirect's destinations were not formatted as an array."
             );
         }
-        redirect.destinations.forEach(destination => {
-            if (!destination.id || !destination.token)
-                throw new Error("ID or Token was missing from one of the destinations.")
+        redirect.destinations= redirect.destinations.map(destination => {
+            try {
+                let pathUrl = new URL(<any>destination).pathname;
+                let dest = path.test(pathUrl);
+                assert(dest.id)
+                assert(dest.token)
+                return <WebhookId>dest
+            } catch (error) {
+                throw new Error(`Invalid webhook url ${JSON.stringify(destination)}`)    
+            }            // throw new Error("ID or Token was missing from one of the destinations.")
+            
         });
     }
     return true;
