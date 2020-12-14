@@ -5,7 +5,7 @@
 
 The purpose of this bot is to allow you to copy messages from one Discord channel to another Discord channel, even if you don't have permission to add a bot account to the guild you are copying from.
 
-This is done by turning your own Discord account into a bot -- copied messages are sent by _you_, not a bot.
+This is done by turning your own Discord account into a bot -- reading messages is done by you, copied messages are sent by a webhook.
 
 **NOTE:** Using this (or any) self-bot is **against Discord's [Terms of Service](https://discordapp.com/terms)** — use at your own risk!
 
