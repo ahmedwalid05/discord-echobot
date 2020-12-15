@@ -7,10 +7,27 @@
                 "293786491642983642"
             ],
             "destinations": [
-                {
-                    "id": "780897979828797461",
-                    "token": "AGZw.yourtoken-shouldgoherejklsdfhsoiehfseihfseifbisoehfoisefise"
-                }
+              "https://discord.com/api/webhooks/id/token"
+            ],
+            "options": {
+                "title": "New Copied Message",
+                "richEmbed": true,
+                "richEmbedColor": 30975,
+                "includeSource": true,
+                "removeEveryone": true,
+                "removeHere": true,
+                "copyRichEmbed": true,
+                "copyAttachments": true,
+                "accurateImage": true
+            }
+        }
+        ,{
+            "sources": [
+                "283746523864294373",
+                "293786491642983642"
+            ],
+            "destinations": [
+              "https://discord.com/api/webhooks/id/token"
             ],
             "options": {
                 "title": "New Copied Message",
@@ -33,10 +50,7 @@
                     "293786491642983642"
                 ],
                 "destinations": [
-                    {
-                        "id": "129863219696239848",
-                        "token": "AGZw.yourtoken-shouldgoherejklsdfhsoiehfseihfseifbisoehfoisefise"
-                    }
+                    "https://discord.com/api/webhooks/id/token"
                 ],
                 "options": {
                     "title": "New Copied Message",

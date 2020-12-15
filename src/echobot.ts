@@ -15,11 +15,10 @@ import {
 import { logger } from "./logger";
 import { loadConfiguration } from "./config";
 import fetch from "node-fetch";
-import { MessageBuilder, Webhook } from 'discord-webhook-node'
 
 
-const getUrls = require("get-urls");
-const isImageUrl = require("is-image-url");
+import {getUrls} from "./utils";
+import * as isImageUrl from "is-image-url";
 // Constants
 const imageExts = [
   "jpg",

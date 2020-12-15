@@ -12,3 +12,6 @@ npm-debug.log
 log.log
 schema.json
 vtrpc.ico
+.python-version
+temp
+release
