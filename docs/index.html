@@ -168,7 +168,7 @@
         "click",
         function (e) {
           e.preventDefault();
-          var example = editor.getValue();
+          var example = JSON.parse(JSON.stringify(editor.getValue()));
           switchColorFormat(example);
           
           filename = "config.json";
@@ -202,17 +202,19 @@
       normal?.forEach((re) => {
         if (re?.options?.richEmbedColor) {
           let color = re?.options?.richEmbedColor;
-          if (!color) return;
-          re.options.richEmbedColor = parseInt(color.substr(1), 16);
+          if (!color) return re;
+          re.options.richEmbedColor = parseInt(color?.substr(1), 16);
+          return re;
         } 
       });
 
       let filter = conf?.filteredRedirects;
-      filter?.forEach((re) => {
+      filter?.map((re) => {
         if (re?.redirect?.options?.richEmbedColor) {
           let color = re?.redirect?.options?.richEmbedColor;
           if (!color) return;
-          re.redirect.options.richEmbedColor = parseInt(color.substr(1), 16);
+          re.redirect.options.richEmbedColor = parseInt(color?.substr(1), 16);
+          return re;
         }
       });
     }

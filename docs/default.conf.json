@@ -30,7 +30,7 @@
             "options": {
                 "title": "New Message Received from #memes",
                 "richEmbed": true,
-                "richEmbedColor": "#000000",
+                "richEmbedColor": "#ef6a6a",
                 "includeSource": true,
                 "removeEveryone": true,
                 "removeHere": true,
@@ -52,7 +52,7 @@
                 "options": {
                     "title": "New Message Received from #stocks",
                     "richEmbed": true,
-                    "richEmbedColor": "#000000",
+                    "richEmbedColor": "#ef6a6a",
                     "includeSource": true,
                     "removeEveryone": true,
                     "removeHere": true,
