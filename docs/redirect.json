@@ -1,0 +1,99 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Redirect",
+    "description": "To Redirect from a channel to a webhook normally. All channel ID's listed in the source will be redirected to All the webhooks listed in the destinations.",
+    "type": "object",
+    "properties": {
+        "sources": {
+            "type": "array",
+            "title": "Source",
+            "description": "The Source Channel ID",
+            "items": {
+                "title": "ID",
+                "type": "number"
+            },
+            "minItems": 1
+        },
+        "destinations": {
+            "type": "array",
+            "title": "Destination",
+            "description": "The destination's Channel webhook",
+            "items": {
+                "title": "Webhook",
+                "type": "string"
+            },
+            "minItems": 1
+        },
+        "options": {
+            "title": "Redirect Options",
+            "type": "object",
+            "properties": {
+                "title": {
+                    "title": "Title",
+                    "description": "The Embeds title's",
+                    "example": "New Message",
+                    "type": "string"
+                },
+                "richEmbed": {
+                    "title": "Copy Rich Embed",
+                    "description": "Keep True",
+                    "type": "boolean"
+                },
+                "richEmbedColor": {
+                    "title": "Rich Embed Color",
+                    "description": "The Color of the forwarded embed",
+                    "type": "string",
+                    "format": "color",
+                    "default": "#000000"
+                },
+                "includeSource": {
+                    "title": "Include Source",
+                    "description": "Add the source of message to the embed",
+                    "type": "boolean"
+                },
+                "removeEveryone": {
+                    "title": "Remove everyone tag",
+                    "type": "boolean"
+                },
+                "removeHere": {
+                    "title": "Remove here tag",
+                    "type": "boolean"
+                },
+                "copyRichEmbed": {
+                    "title": "Copy Rich Embed",
+                    "description": "Whether To copy rich embeds or ignore them",
+                    "type": "boolean"
+                },
+                "copyAttachments": {
+                    "title": "Copy Attachments",
+                    "type": "boolean"
+                },
+                "accurateImage": {
+                    "title": "Accurate Image",
+                    "description": "When True with `copyAttachments`, image links will be converted into images",
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                "title",
+                "richEmbed",
+                "richEmbedColor",
+                "includeSource",
+                "removeEveryone",
+                "removeHere",
+                "copyRichEmbed",
+                "copyAttachments",
+                "accurateImage"
+            ],
+            "format": "grid",
+            "grid-break": true,
+            "grid_columns": "2"
+        }
+    },
+    "required": [
+        "sources",
+        "destinations",
+        "options"
+    ],
+    "format": "categories"
+}

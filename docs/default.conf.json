@@ -1,0 +1,72 @@
+{
+    "token": "",
+    "redirects": [
+        {
+            "sources": [
+                "407264269174347412"
+            ],
+            "destinations": [
+                "WEB_HOOK_URL"
+            ],
+            "options": {
+                "title": "New Message Received from #general",
+                "richEmbed": true,
+                "richEmbedColor": "#ef6a6a",
+                "includeSource": false,
+                "removeEveryone": true,
+                "removeHere": true,
+                "copyRichEmbed": true,
+                "copyAttachments": true,
+                "accurateImage": true
+            }
+        },
+        {
+            "sources": [
+                "407264269174447489"
+            ],
+            "destinations": [
+                "WEB_HOOK_URL"
+            ],
+            "options": {
+                "title": "New Message Received from #memes",
+                "richEmbed": true,
+                "richEmbedColor": "#000000",
+                "includeSource": true,
+                "removeEveryone": true,
+                "removeHere": true,
+                "copyRichEmbed": true,
+                "copyAttachments": true,
+                "accurateImage": true
+            }
+        }
+    ],
+    "filteredRedirects": [
+        {
+            "redirect":  {
+                "sources": [
+                    "407264269174447489"
+                ],
+                "destinations": [
+                    "WEB_HOOK_URL"
+                ],
+                "options": {
+                    "title": "New Message Received from #stocks",
+                    "richEmbed": true,
+                    "richEmbedColor": "#000000",
+                    "includeSource": true,
+                    "removeEveryone": true,
+                    "removeHere": true,
+                    "copyRichEmbed": true,
+                    "copyAttachments": true,
+                    "accurateImage": true
+                }
+            },
+            "words": [
+                "bullish", 
+                "buy", 
+                "sell"
+            ],
+            "ignoreQuote": true
+        }
+    ]
+}

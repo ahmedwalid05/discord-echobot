@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script>
+      //Defaults
+      const defaultConfig = {
+        token: "",
+        redirects: [
+          {
+            sources: ["407264269174347412"],
+            destinations: ["WEB_HOOK_URL"],
+            options: {
+              title: "New Message Received from #general",
+              richEmbed: true,
+              richEmbedColor: "#ef6a6a",
+              includeSource: false,
+              removeEveryone: true,
+              removeHere: true,
+              copyRichEmbed: true,
+              copyAttachments: true,
+              accurateImage: true,
+            },
+          },
+          {
+            sources: ["407264269174447489"],
+            destinations: ["WEB_HOOK_URL"],
+            options: {
+              title: "New Message Received from #memes",
+              richEmbed: true,
+              richEmbedColor: "#000000",
+              includeSource: true,
+              removeEveryone: true,
+              removeHere: true,
+              copyRichEmbed: true,
+              copyAttachments: true,
+              accurateImage: true,
+            },
+          },
+        ],
+        filteredRedirects: [
+          {
+            redirect: {
+              sources: ["407264269174447489"],
+              destinations: ["WEB_HOOK_URL"],
+              options: {
+                title: "New Message Received from #stocks",
+                richEmbed: true,
+                richEmbedColor: "#000000",
+                includeSource: true,
+                removeEveryone: true,
+                removeHere: true,
+                copyRichEmbed: true,
+                copyAttachments: true,
+                accurateImage: true,
+              },
+            },
+            words: ["bullish", "buy", "sell"],
+            ignoreQuote: true,
+          },
+        ],
+      };
+    </script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Config Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css"> -->
+    <!-- <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-exp.min.css"> -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    />
+
+    <!-- fontawesome5 -->
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.6.1/css/all.css"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/@json-editor/json-editor@latest/dist/jsoneditor.min.js"></script>
+    <!-- vanilla picker -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/vanilla-picker@2.10.1/dist/vanilla-picker.min.js"
+      integrity="sha256-3fnRmJ7NTcR4T37E9L7tvEHuRHMGBdvnvlGq2CbRw80="
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      JSONEditor.defaults.theme = "bootstrap4";
+      JSONEditor.defaults.iconlib = "fontawesome5";
+    </script>
+    <style>
+      .container {
+        max-width: 90%;
+        margin: 0 auto;
+      }
+      body {
+        margin: 1em;
+      }
+      #btn-holder {
+        padding: 0 auto;
+        margin: 0 auto;
+        justify-content: center;
+        align-items: center;
+        display: flex;
+      }
+      label {
+        display: inline-block;
+      }
+    </style>
+  </head>
+  <body>
+    <span hidden="true" id="valid_indicator" class="label"></span>
+    <div id="editor_holder" class="container"></div>
+    <div id="btn-holder"></div>
+  </body>
+  <script>
+    var starting_value = defaultConfig;
+    
+    var editor = new JSONEditor(document.getElementById("editor_holder"), {
+      // Enable fetching schemas via ajax
+      ajax: true,
+
+      iconlib: "fontawesome5",
+      // The schema for the editor
+      schema: {
+        $ref: "schema.json",
+        format: "grid",
+      },
+      disable_collapse: true,
+      disable_edit_json: true,
+      disable_properties: true,
+
+      // Seed the form with a starting value
+      startval: starting_value,
+    });
+
+    // Hook up the validation indicator to update its
+    // status whenever the editor changes
+    editor.on("change", function () {
+      // Get an array of errors from the validator
+      var errors = editor.validate();
+
+      var indicator = document.getElementById("valid_indicator");
+
+      // Not valid
+      if (errors.length) {
+        indicator.className = "label alert";
+        indicator.textContent = "not valid";
+      }
+      // Valid
+      else {
+        indicator.className = "label success";
+        indicator.textContent = "valid";
+      }
+    });
+    editor.on("ready", function () {
+      var button = editor.root.getButton(
+          "Save Result As File",
+          "save",
+          "Save Result As File"
+        ),
+        button_holder = editor.root.theme.getHeaderButtonHolder();
+
+      document.querySelector("#btn-holder").appendChild(button);
+
+      button.addEventListener(
+        "click",
+        function (e) {
+          e.preventDefault();
+          var example = editor.getValue();
+          switchColorFormat(example);
+          
+          filename = "config.json";
+          blob = new Blob([JSON.stringify(example, null, 2)], {
+            type: "application/json;charset=utf-8",
+          });
+
+          if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            window.navigator.msSaveOrOpenBlob(blob, filename);
+          } else {
+            var a = document.createElement("a");
+            a.download = filename;
+            a.href = URL.createObjectURL(blob);
+            a.dataset.downloadurl = ["text/plain", a.download, a.href].join(
+              ":"
+            );
+            a.dispatchEvent(
+              new MouseEvent("click", {
+                view: window,
+                bubbles: true,
+                cancelable: false,
+              })
+            );
+          }
+        },
+        false
+      );
+    });
+    function switchColorFormat(conf) {
+      let normal = conf?.redirects;
+      normal?.forEach((re) => {
+        if (re?.options?.richEmbedColor) {
+          let color = re?.options?.richEmbedColor;
+          if (!color) return;
+          re.options.richEmbedColor = parseInt(color.substr(1), 16);
+        } 
+      });
+
+      let filter = conf?.filteredRedirects;
+      filter?.forEach((re) => {
+        if (re?.redirect?.options?.richEmbedColor) {
+          let color = re?.redirect?.options?.richEmbedColor;
+          if (!color) return;
+          re.redirect.options.richEmbedColor = parseInt(color.substr(1), 16);
+        }
+      });
+    }
+  </script>
+</html>
