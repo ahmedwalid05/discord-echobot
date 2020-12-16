@@ -10,7 +10,6 @@ npm-debug.log
 *.ipr
 *.iws
 log.log
-schema.json
 vtrpc.ico
 .python-version
 temp
