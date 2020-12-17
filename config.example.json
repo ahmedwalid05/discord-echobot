@@ -1,4 +1,4 @@
-{
+[{
     "token": "mfa.yourtoken-shouldgoherejklsdfhsoiehfseihfseifbisoehfoisefise",
     "redirects": [
         {
@@ -72,4 +72,4 @@
             "ignoreQuote": true
         }
     ]
-}
+}]
