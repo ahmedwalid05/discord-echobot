@@ -59,9 +59,6 @@ function main(): void {
     return;
   }
 
-
-
-
   // Login to the Discord Client.
   loginToDiscord();
 }

@@ -2,7 +2,6 @@ import { logger } from '../logger'
 import * as fs from "fs";
 import { EchobotConfiguration, EchobotFilter, EchobotRedirect, WebhookId } from '../models';
 import { Path } from 'path-parser'
-import { url } from 'inspector';
 import { assert } from 'console';
 
 
@@ -16,14 +15,15 @@ export function loadConfiguration(path): EchobotConfiguration {
 
 
     let config: EchobotConfiguration;
-    if (fs.existsSync(path)) {
+    if (process.env.ECHOBOT_CONFIG_JSON) {
+        // Parse the env var contents as JSON.
+        config = JSON.parse(process.env.ECHOBOT_CONFIG_JSON);
+    } else if (fs.existsSync(path)) {
         // Parse the file as JSON.
         config = JSON.parse(fs.readFileSync(path).toString());
 
-    } else if (process.env.ECHOBOT_CONFIG_JSON) {
-        // Parse the env var contents as JSON.
-        config = JSON.parse(process.env.ECHOBOT_CONFIG_JSON);
-    } else {
+    }
+    else {
         throw Error("No configuration could be found. Either create a config.json file or put the config in the ECHOBOT_CONFIG_JSON environment variable.")
     }
     checkConfiguration(config);
@@ -95,7 +95,7 @@ function checkRedirectModel(redirects: EchobotRedirect[]) {
                 "A redirect's destinations were not formatted as an array."
             );
         }
-        redirect.destinations= redirect.destinations.map(destination => {
+        redirect.destinations = redirect.destinations.map(destination => {
             try {
                 let pathUrl = new URL(<any>destination).pathname;
                 let dest = path.test(pathUrl);
@@ -103,9 +103,9 @@ function checkRedirectModel(redirects: EchobotRedirect[]) {
                 assert(dest.token)
                 return <WebhookId>dest
             } catch (error) {
-                throw new Error(`Invalid webhook url ${JSON.stringify(destination)}`)    
+                throw new Error(`Invalid webhook url ${JSON.stringify(destination)}`)
             }            // throw new Error("ID or Token was missing from one of the destinations.")
-            
+
         });
     }
     return true;
