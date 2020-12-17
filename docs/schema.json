@@ -1,9 +1,10 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "array",
+  "title": "Echo Bot Configuration",
   "items": {
     "type": "object",
-    "title": "Echo Bot Configuration",
+    "title": "Bot",
     "properties": {
       "token": {
         "title": "Token",
