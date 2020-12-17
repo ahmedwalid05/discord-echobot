@@ -17,7 +17,7 @@ import { loadConfiguration } from "./config";
 import fetch from "node-fetch";
 
 
-import {getUrls} from "./utils";
+import { getUrls } from "./utils";
 import * as isImageUrl from "is-image-url";
 // Constants
 const imageExts = [
@@ -35,115 +35,97 @@ const imageExts = [
   "apng",
 ];
 
-// Create global configuration variable.
-let config: EchobotConfiguration = null;
-
-// Create global discord client variable.
-let discordClient: Client = null;
-
-// Keeps track of the last echo executed, to prevent duplicate messages
-let lastEcho = null;
-
-// Call the main function.
-main();
-
-/**
- * Starts the bot, verifying configuration files as needed.
- */
 function main(): void {
   // Load the configuration file.
+  var configs: EchobotConfiguration[];
   try {
-    config = loadConfiguration("config.json");
+     configs= loadConfiguration("config.json");
   } catch (error) {
     logger.error(error)
     return;
   }
-
-  // Login to the Discord Client.
-  loginToDiscord();
-}
-
-/**
- * Starts the web server that accepts ping messages, if the PORT environment variable is defined.
- *
- * The purpose of this server is to allow the bot to be used on PaaS infrastructures like Heroku,
- * which expect applications to bind to a web port -- as well as allowing for uptime monitoring.
- */
-function startWebServer(): void {
-  // Ensure PORT env var is defined.
-  if (!process.env.PORT || isNaN(Number.parseInt(process.env.PORT))) return;
-
-  logger["info"]("Starting web server on port " + process.env.PORT);
-
-  // Create a server and bind it to the environment variable PORT.
-  http
-    .createServer((req, res) => {
-      res.write("pong");
-      res.end();
-    })
-    .listen(process.env.PORT);
-}
-
-/**
- * Signs into the Discord client with the token in the config,
- * and subscribes to message listeners.
- */
-function loginToDiscord(): void {
-  // Create client, but don't login yet.
-  discordClient = new discord.Client();
-
-  // Register event for when client is ready.
-  discordClient.on("ready", () => {
-    logger["info"]("Signed into Discord.");
-  });
-
-  // Register event for when client receives a message.
-  discordClient.on("message", onDiscordClientMessageReceived);
-
-  // Register event for when an error occurs.
-  discordClient.on("error", (error) => {
-    logger["error"]("An error occurred: " + error.message);
-    logger["info"]("Restarting Discord Client.");
-    loginToDiscord();
-  });
-
-  // Login.
-  discordClient.login(config.token).catch((err) => {
-    logger["error"]("Could not sign into Discord: " + err);
+  configs.forEach(config => {
+    
+    new EchoBot(config);
   });
 }
 
-/**
- * Fired when a message is received on Discord in any channel.
- * @param message The message that was received.
- */
-function onDiscordClientMessageReceived(message: Message): void {
-  // Find redirects that have this message's channel id as a source.
-  let matchingRedirects = config.redirects.filter((redirect) =>
-    redirect.sources.some((source) => source == message.channel.id)
-  );
 
-  // logger["info"]("Reached Here")
-  let matchingRedirectsFiltered = config.filteredRedirects
-    .filter(
-      (filteredRedirects) =>
-        filteredRedirects.redirect.sources.some(
-          (source) => source == message.channel.id
-        ) &&
-        filteredRedirects.words.some((word) => {
-          if (filteredRedirects.ignoreQuote)
-            var regexMatcher = new RegExp(
-              `${word.toLowerCase()}(?=[^"]*(?:"[^"]*"[^"]*)*$)`
-            );
-          else var regexMatcher = new RegExp(`${word.toLowerCase()}`);
-          // console.log(message.content.toLowerCase().match(regexMatcher)?.length>0);
-          return message.content.toLowerCase().match(regexMatcher)?.length > 0;
-        })
-    )
-    .map((echobotFilter) => echobotFilter.redirect);
-  redirect(message, matchingRedirects);
-  redirect(message, matchingRedirectsFiltered);
+class EchoBot {
+
+  // Create global configuration variable.
+  config: EchobotConfiguration = null;
+
+  // Create global discord client variable.
+  discordClient: Client = null;
+  constructor(config: EchobotConfiguration) {
+    this.config = config;
+    
+    this.loginToDiscord();
+  }
+  /**
+   * Signs into the Discord client with the token in the config,
+   * and subscribes to message listeners.
+   */
+  loginToDiscord(): void {
+
+    // Create client, but don't login yet.
+    this.discordClient = new discord.Client();
+    (<any>this.discordClient).config = this.config
+    // Register event for when client is ready.
+    this.discordClient.on("ready", () => {
+      logger["info"]("Signed into Discord.");
+    });
+
+    // Register event for when client receives a message.
+    this.discordClient.on("message", this.onDiscordClientMessageReceived);
+
+    // Register event for when an error occurs.
+    this.discordClient.on("error", (error) => {
+      logger["error"]("An error occurred: " + error.message);
+      logger["info"]("Restarting Discord Client.");
+      this.loginToDiscord();
+    });
+
+    // Login.
+    this.discordClient.login(this.config.token).catch((err) => {
+      logger["error"]("Could not sign into Discord: " + err);
+    });
+  }
+  /**
+  * Fired when a message is received on Discord in any channel.
+  * @param message The message that was received.
+  */
+  onDiscordClientMessageReceived(message: Message): void {
+    // Find redirects that have this message's channel id as a source.
+    let matchingRedirects = this.config.redirects.filter((redirect) =>
+      redirect.sources.some((source) => source == message.channel.id)
+    );
+
+    // logger["info"]("Reached Here")
+    let matchingRedirectsFiltered = this.config.filteredRedirects
+      .filter(
+        (filteredRedirects) =>
+          filteredRedirects.redirect.sources.some(
+            (source) => source == message.channel.id
+          ) &&
+          filteredRedirects.words.some((word) => {
+            if (filteredRedirects.ignoreQuote)
+              var regexMatcher = new RegExp(
+                `${word.toLowerCase()}(?=[^"]*(?:"[^"]*"[^"]*)*$)`
+              );
+            else var regexMatcher = new RegExp(`${word.toLowerCase()}`);
+            // console.log(message.content.toLowerCase().match(regexMatcher)?.length>0);
+            return message.content.toLowerCase().match(regexMatcher)?.length > 0;
+          })
+      )
+      .map((echobotFilter) => echobotFilter.redirect);
+    redirect(message, matchingRedirects);
+    redirect(message, matchingRedirectsFiltered);
+  }
 }
+
+
 async function redirect(
   message: Message,
   matchingRedirects: EchobotRedirect[]
@@ -265,3 +247,5 @@ function getImageLink(message: string, accurate): string {
   }
   return null;
 }
+
+main();

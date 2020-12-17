@@ -1,53 +1,56 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "object",
-  "title": "Echo Bot Configuration",
-  "properties": {
-    "token": {
-      "title": "Token",
-      "description": "Your Discord's account token",
-      "type": "string"
-    },
-    "redirects": {
-      "title": "Redirects",
-      "description": "A list of redirects definitions  ",
-      "type": "array",
-      "items": {
-        "$ref": "redirect.json"
-      }
-    },
-    "filteredRedirects": {
-      "title": "Filtered Redirects",
-      "description": "Redirects that use only redirect specific words",
-      "type": "array",
-      "items": {
-        "title": "Filtered redirect",
-        "properties": {
-          "redirect": {
-            "$ref": "redirect.json"
-          },
-          "words": {
-            "title": "Words",
-            "description": "Only forward messages that contain these words",
-            "type": "array",
-            "items": {
-              "title": "Word",
-              "type": "string"
+  "type": "array",
+  "items": {
+    "type": "object",
+    "title": "Echo Bot Configuration",
+    "properties": {
+      "token": {
+        "title": "Token",
+        "description": "Your Discord's account token",
+        "type": "string"
+      },
+      "redirects": {
+        "title": "Redirects",
+        "description": "A list of redirects definitions  ",
+        "type": "array",
+        "items": {
+          "$ref": "redirect.json"
+        }
+      },
+      "filteredRedirects": {
+        "title": "Filtered Redirects",
+        "description": "Redirects that use only redirect specific words",
+        "type": "array",
+        "items": {
+          "title": "Filtered redirect",
+          "properties": {
+            "redirect": {
+              "$ref": "redirect.json"
+            },
+            "words": {
+              "title": "Words",
+              "description": "Only forward messages that contain these words",
+              "type": "array",
+              "items": {
+                "title": "Word",
+                "type": "string"
+              }
+            },
+            "ignoreQuote": {
+              "title": "Ignore Quotes",
+              "description": "Don't forward messages that are quoted",
+              "type": "boolean"
             }
-          },
-          "ignoreQuote": {
-            "title": "Ignore Quotes",
-            "description": "Don't forward messages that are quoted",
-            "type": "boolean"
           }
         }
       }
-    }
-  },
-  "required": [
-    "token",
-    "redirects",
-    "filteredRedirects"
-  ],
-  "format": "categories"
+    },
+    "required": [
+      "token",
+      "redirects",
+      "filteredRedirects"
+    ],
+    "format": "categories"
+  }
 }

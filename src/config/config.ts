@@ -10,24 +10,28 @@ import { assert } from 'console';
  * @param path The path to the configuration file, if file is not passed, process variable is used
  * @returns True if configuration loaded successfully, false otherwise.
  */
-export function loadConfiguration(path): EchobotConfiguration {
+export function loadConfiguration(path): EchobotConfiguration[] {
 
 
 
-    let config: EchobotConfiguration;
+    let configs: EchobotConfiguration[];
     if (process.env.ECHOBOT_CONFIG_JSON) {
         // Parse the env var contents as JSON.
-        config = JSON.parse(process.env.ECHOBOT_CONFIG_JSON);
+        configs = JSON.parse(process.env.ECHOBOT_CONFIG_JSON);
     } else if (fs.existsSync(path)) {
         // Parse the file as JSON.
-        config = JSON.parse(fs.readFileSync(path).toString());
-
+        configs = JSON.parse(fs.readFileSync(path).toString());
     }
     else {
         throw Error("No configuration could be found. Either create a config.json file or put the config in the ECHOBOT_CONFIG_JSON environment variable.")
     }
-    checkConfiguration(config);
-    return config;
+    if (!configs || !configs.length || configs.length < 1)
+        throw new Error("No Bot configuration items were found. Please Make sure to have at least one");
+    configs.forEach(config => {
+        checkConfiguration(config);
+    });
+
+    return configs;
 }
 /**
  * Check the configuration object for errors 
