@@ -116,7 +116,7 @@
   </body>
   <script>
     var starting_value = defaultConfig;
-    
+
     var editor = new JSONEditor(document.getElementById("editor_holder"), {
       // Enable fetching schemas via ajax
       ajax: true,
@@ -170,7 +170,7 @@
           e.preventDefault();
           var example = JSON.parse(JSON.stringify(editor.getValue()));
           switchColorFormat(example);
-          
+
           filename = "config.json";
           blob = new Blob([JSON.stringify(example, null, 2)], {
             type: "application/json;charset=utf-8",
@@ -197,25 +197,27 @@
         false
       );
     });
-    function switchColorFormat(conf) {
-      let normal = conf?.redirects;
-      normal?.forEach((re) => {
-        if (re?.options?.richEmbedColor) {
-          let color = re?.options?.richEmbedColor;
-          if (!color) return re;
-          re.options.richEmbedColor = parseInt(color?.substr(1), 16);
-          return re;
-        } 
-      });
+    function switchColorFormat(conf_array) {
+      conf_array?.forEach((conf) => {
+        let normal = conf?.redirects;
+        normal?.forEach((re) => {
+          if (re?.options?.richEmbedColor) {
+            let color = re?.options?.richEmbedColor;
+            if (!color) return re;
+            re.options.richEmbedColor = parseInt(color?.substr(1), 16);
+            return re;
+          }
+        });
 
-      let filter = conf?.filteredRedirects;
-      filter?.map((re) => {
-        if (re?.redirect?.options?.richEmbedColor) {
-          let color = re?.redirect?.options?.richEmbedColor;
-          if (!color) return;
-          re.redirect.options.richEmbedColor = parseInt(color?.substr(1), 16);
-          return re;
-        }
+        let filter = conf?.filteredRedirects;
+        filter?.map((re) => {
+          if (re?.redirect?.options?.richEmbedColor) {
+            let color = re?.redirect?.options?.richEmbedColor;
+            if (!color) return;
+            re.redirect.options.richEmbedColor = parseInt(color?.substr(1), 16);
+            return re;
+          }
+        });
       });
     }
   </script>
